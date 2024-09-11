@@ -1,6 +1,9 @@
 import asyncio
 import argparse
 
+from rich.style import Style
+from rich import print as rprint
+
 from .appsec import main
 
 
@@ -11,17 +14,15 @@ def cli():
     parser.add_argument('--to_event', help='The target commit SHA or tag to compare against')
 
     args = parser.parse_args()
-    print(("args", args))
 
-    asyncio.run(
-        main(
-            repo=args.repo,
-            to_event=args.to_event,
-            from_event=args.from_event,
+    try:
+        asyncio.run(
+            main(
+                repo=args.repo,
+                to_event=args.to_event,
+                from_event=args.from_event,
+            )
         )
-    )
-
-
-
-
-
+    except Exception as e:
+        rprint(f":x: {str(e)}", Style(color="red", bold=False, underline=True))
+        exit(1)
