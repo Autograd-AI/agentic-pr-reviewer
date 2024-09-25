@@ -39,7 +39,7 @@ async def create_run(session, repo: str, to_event: str, from_event: str = None):
         res = await response.json()
         reviews = res.get("reviews", [])
         for review in reviews:
-            if review.severity_failure:
+            if review.get("severity_failure"):
                 action_failure_reviews.append(review)
 
         if action_failure_reviews:
