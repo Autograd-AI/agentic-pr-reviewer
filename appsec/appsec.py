@@ -43,7 +43,7 @@ async def create_run(session, repo: str, to_event: str, from_event: str = None):
                 action_failure_reviews.append(review)
 
         if action_failure_reviews:
-            exception_detail = '\n'.join([f"Reason: {o.reason}, Severity: {o.severity_failure}" for o in action_failure_reviews])
+            exception_detail = '\n'.join([f"Reason: {o.get('reason')}, Severity: {o.get('severity_failure')}" for o in action_failure_reviews])
             raise SeverityActionFailureException(
                 f"The following reviews have a failure severity level: {exception_detail}"
             )
