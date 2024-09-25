@@ -34,3 +34,6 @@ class ServerErrorException(Exception):
         return dedent(
             "Something went wrong. Please contact support: developers@autograd.ai"
         )
+
+class SeverityActionFailureException(Exception):
+    pass

@@ -7,7 +7,8 @@ from .exceptions import (
     InvalidateCredentialsException,
     BadRequestException,
     ServerErrorException,
-    APITokenNotSetException
+    APITokenNotSetException,
+    SeverityActionFailureException
 )
 
 
@@ -17,6 +18,7 @@ async def create_run(session, repo: str, to_event: str, from_event: str = None):
         'to_event': to_event,
         'from_event': from_event
     }) as response:
+        action_failure_reviews = []
         if response.status >= 400:
             try:
                 error_detail = await response.json()  # Get error details from JSON response
@@ -34,7 +36,17 @@ async def create_run(session, repo: str, to_event: str, from_event: str = None):
                 # raise a generic error
                 response.raise_for_status()
 
-        return await response.json()
+        res = await response.json()
+        reviews = res.get("reviews", [])
+        for review in reviews:
+            if review.severity_failure:
+                action_failure_reviews.append(review)
+
+        if action_failure_reviews:
+            exception_detail = '\n'.join([f"Reason: {o.reason}, Severity: {o.severity_failure}" for o in action_failure_reviews])
+            raise SeverityActionFailureException(
+                f"The following reviews have a failure severity level: {exception_detail}"
+            )
 
 
 async def main(
