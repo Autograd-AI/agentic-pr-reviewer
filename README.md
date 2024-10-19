@@ -1,2 +1,2 @@
 # appsec
-To run on a local environment, run `poetry run python -m appsec`
+To run on a local environment, execute `poetry run python -m appsec`
