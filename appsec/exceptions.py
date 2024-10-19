@@ -24,6 +24,16 @@ class APITokenNotSetException(Exception):
         )
 
 
+class LLMProviderAPIKeyNotSetException(Exception):
+    def __str__(self):
+        return dedent(
+            """
+            You did not provide a provider LLM API key in your environment variables. 
+            Generate and set a valid `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` value.
+            """
+        )
+
+
 class BadRequestException(Exception):
     pass
 

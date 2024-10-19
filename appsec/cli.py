@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 import argparse
 
 from rich.style import Style
@@ -24,5 +25,6 @@ def cli():
             )
         )
     except Exception as e:
+        print(traceback.format_exc())
         rprint(f":x: {str(e)}", Style(color="red", bold=False, underline=True))
         exit(1)
