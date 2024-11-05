@@ -81,17 +81,22 @@ def parse_code_suggestions(content: str) -> CodeSuggestions:
 
 def create_inline_suggestion_review(suggestion: CodeSuggestion, pull_request: PullRequest, head_commit: Commit.Commit) -> PullRequestReview.PullRequestReview:
     print(("suggestion", suggestion))
+    comment = {
+        "path": suggestion.filename,
+        "start_side": "RIGHT",
+        "body": f"{suggestion.summary}\n```suggestion\n{suggestion.suggested_code}\n```"
+    }
+    if suggestion.line_number_end > suggestion.line_number_start:
+        comment["line"] = suggestion.line_number_end
+        comment["start_line"] = suggestion.line_number_start
+    else:
+        comment["line"] = suggestion.line_number_start
+
     return pull_request.create_review(
         commit=head_commit,
         event="COMMENT",
         body=suggestion.summary,
-        comments=[{
-            "path": suggestion.filename,
-            "line": suggestion.line_number_end,
-            "start_line": suggestion.line_number_start,
-            "start_side": "RIGHT",
-            "body": f"{suggestion.summary}\n```suggestion\n{suggestion.suggested_code}\n```"
-        }]
+        comments=[comment]
     )
 
 
@@ -103,21 +108,21 @@ async def execute_agents(repo: str, to_event: str, from_event: str = None):
             'appsec/prompts/manager_agent.toml',
         ],
     )
-    print(("prompt_templates", prompt_templates, dir(prompt_templates)))
+    # print(("prompt_templates", prompt_templates, dir(prompt_templates)))
 
     code_suggestion_prompt = prompt_templates.code_suggestion_prompt.system
-    print(("code_suggestion_prompt", code_suggestion_prompt))
+    # print(("code_suggestion_prompt", code_suggestion_prompt))
 
     parser = PydanticOutputParser(pydantic_object=CodeSuggestions)
 
     code_suggestion_prompt = code_suggestion_prompt.format(
         formatting_instructions=parser.get_format_instructions()
     )
-    print("code_suggestion_prompt.2")
-    print(code_suggestion_prompt)
+    # print("code_suggestion_prompt.2")
+    # print(code_suggestion_prompt)
 
     manager_agent_system_message = prompt_templates.manager_agent.system
-    print(("manager_agent_system_message", manager_agent_system_message))
+    # print(("manager_agent_system_message", manager_agent_system_message))
 
     if to_event.isdigit():
         pull_request_number = int(to_event)
@@ -128,6 +133,7 @@ async def execute_agents(repo: str, to_event: str, from_event: str = None):
         repo_name=repo,
         pull_request_number=pull_request_number
     )
+    print(("context", context))
 
     llm_config = get_llm_settings_config()
 
@@ -181,12 +187,13 @@ async def execute_agents(repo: str, to_event: str, from_event: str = None):
         }
     ])
     autogen.runtime_logging.stop()
-    print(("chat_results", chat_results))
+    # print(("chat_results", chat_results))
 
     mitigation_expert_result = chat_results[-1].chat_history[-1]
-    print(("mitigation_expert_result", mitigation_expert_result))
+    # print(("mitigation_expert_result", mitigation_expert_result))
 
     content = mitigation_expert_result.get('content')
+    print(("raw.content", content))
 
     client = get_github_client()
     repo_object = client.get_repo(repo)

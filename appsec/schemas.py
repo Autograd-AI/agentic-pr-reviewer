@@ -3,6 +3,9 @@ from pydantic import BaseModel, Field
 
 
 class CodeSuggestion(BaseModel):
+    """
+    Pay close attention to the description of each field.
+    """
     filename: str = Field(description="Complete path of the relevant file for which code is to be changed. "
                                       "You must include the entire URL path as provided in the context. "
                                       "Do not attempt to shorten it in any way. "
@@ -10,9 +13,9 @@ class CodeSuggestion(BaseModel):
                                       "Do not include the surrounding <file_name> tags.")
     language: str = Field(description="Relevant language of the code change")
     line_number_start: int = Field(
-        description="The relevant line number, from a '__new_code__' section, where the updated suggested code starts (inclusive). Should reflect hunk line numbers.")
+        description="The relevant line number, from a '__new_code__' section, where the updated suggested code starts (inclusive). Should reflect hunk line numbers. This must always be less than the 'line_number_end' number.")
     line_number_end: int = Field(
-        description="The relevant line number, from a '__new_code__' section, where the suggestion ends. Should be derived from the hunk line numbers. This must proceed the start line must proceed the 'line_number_start' value.")
+        description="The relevant line number, from a '__new_code__' section, where the suggestion ends. Should be derived from the hunk line numbers. This must always be greater than the 'line_number_start' number.")
     previous_code: str = Field(
         description="A short code snippet representing for which a change or improvement is suggested. "
                     "Only include the suggested code and immediately proceeding and preceding unchanged lines of code. "

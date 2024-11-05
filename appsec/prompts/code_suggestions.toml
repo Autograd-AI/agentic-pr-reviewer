@@ -47,5 +47,5 @@ Code suggestions must be syntactically valid in the programming language of the 
 
 {formatting_instructions}
 
-*Output your final response in a way that conforms to the specified output schema above. Only output JSON. Do not preface it with any non-JSON text.*
+*Output your final response in a way that strictly conforms to the specified output schema above, paying close attention to the description of each field. Only output JSON. Do not preface it with any non-JSON text.*
 """
